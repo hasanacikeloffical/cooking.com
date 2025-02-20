@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cooking/main.dart';
+import 'package:cooking/pages/CategoryPage.dart';
 
 void main() {
   runApp(MaterialApp(home: HomePage()));
@@ -10,39 +12,66 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectIndex = 0; // Variable to keep track of selected index
+  int _selectIndex = 0;
+  List<String> categories = []; // List to store category names
 
-  final List<String> kutuIsimleri = [
-    "Ana Yemekler",
-    "Çorbalar",
-    "Salatalar",
-    "Mezeler",
-    "Ara Sıcak",
-    "Tatlılar",
-  ];
+  // Yeni kategori ekleme fonksiyonu
+  void _addCategory() {
+    TextEditingController categoryController = TextEditingController();
 
-  // List of corresponding pages for each category
-  final List<Widget> categoryPages = [
-    CategoryPage(title: "Ana Yemekler"),
-    CategoryPage(title: "Çorbalar"),
-    CategoryPage(title: "Salatalar"),
-    CategoryPage(title: "Mezeler"),
-    CategoryPage(title: "Ara Sıcak"),
-    CategoryPage(title: "Tatlılar"),
-  ];
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Yeni Kategori Ekle"),
+          content: TextField(
+            controller: categoryController,
+            decoration: InputDecoration(hintText: "Kategori adını girin"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("İptal"),
+            ),
+            TextButton(
+              onPressed: () {
+                if (categoryController.text.isNotEmpty) {
+                  setState(() {
+                    categories.add(
+                        categoryController.text); // Add new category to list
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: Text("Ekle"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-  // This method handles tapping on a BottomNavigationBar item
   void _onItemTapped(int index) {
     setState(() {
       _selectIndex = index;
     });
+
     if (index == 1) {
-      // If the "Settings" item is tapped, navigate to the SettingsPage
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
       );
     }
+  }
+
+  // Navigate to CategoryPage when a category is tapped
+  void _navigateToCategoryPage(String category) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CategoryPage(title: category)),
+    );
   }
 
   @override
@@ -61,40 +90,37 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          children: List.generate(kutuIsimleri.length, (index) {
-            return GestureDetector(
-              onTap: () {
-                // Navigate to the corresponding category page when a grid item is tapped
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => categoryPages[index],
-                  ),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade100,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    kutuIsimleri[index],
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.amber.shade800,
-                      fontWeight: FontWeight.bold,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ElevatedButton(
+              onPressed: _addCategory,
+              child: Text("Yeni Kategori Ekle"),
+            ),
+            SizedBox(height: 16), // Add some space between button and list
+            Expanded(
+              child: ListView.builder(
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () => _navigateToCategoryPage(
+                        categories[index]), // Navigate on tap
+                    child: Card(
+                      margin: EdgeInsets.symmetric(vertical: 8.0),
+                      child: ListTile(
+                        title: Text(
+                          categories[index],
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        contentPadding: EdgeInsets.all(16.0),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                  );
+                },
               ),
-            );
-          }),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -111,53 +137,24 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Create a page that opens when a box is tapped
-class CategoryPage extends StatelessWidget {
-  final String title;
+class CategoryPage {}
 
-  CategoryPage({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          title,
-          style: TextStyle(
-            color: Colors.amber.shade800,
-          ),
-        ),
-        backgroundColor: Colors.amber.shade100,
-      ),
-      body: Center(
-        child: Container(
-          color: Colors.white, // Set the background to white
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Settings page
+// Ayarlar sayfası
 class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Ayarlar", // Settings title
+          "Ayarlar",
           style: TextStyle(color: Colors.amber.shade800),
         ),
         backgroundColor: Colors.amber.shade100,
       ),
       body: Center(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-          ),
+        child: Text(
+          "Ayarlar Sayfası",
+          style: TextStyle(fontSize: 22),
         ),
       ),
     );
