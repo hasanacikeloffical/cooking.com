@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cooking/pages/homepage.dart';
-import 'package:cooking/pages/settingspage.dart';
-import 'package:cooking/bottom_nav_bar.dart';
+
 
 void main() {
   runApp(const MyApp());

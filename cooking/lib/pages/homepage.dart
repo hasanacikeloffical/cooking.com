@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cooking/main.dart';
-import 'package:cooking/pages/CategoryPage.dart';
+import 'package:cooking/pages/CategoryPage.dart'; // Doğru import edildi!
+import 'package:cooking/bottom_nav_bar.dart';
+import 'package:cooking/pages/settingspage.dart';
+
 
 void main() {
   runApp(MaterialApp(home: HomePage()));
@@ -39,8 +41,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 if (categoryController.text.isNotEmpty) {
                   setState(() {
-                    categories.add(
-                        categoryController.text); // Add new category to list
+                    categories.add(categoryController.text);
                   });
                 }
                 Navigator.pop(context);
@@ -66,7 +67,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Navigate to CategoryPage when a category is tapped
+  // Kategoriye tıklanınca CategoryPage'e git
   void _navigateToCategoryPage(String category) {
     Navigator.push(
       context,
@@ -88,46 +89,65 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         backgroundColor: Colors.amber.shade100,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ElevatedButton(
-              onPressed: _addCategory,
-              child: Text("Yeni Kategori Ekle"),
-            ),
-            SizedBox(height: 16), // Add some space between button and list
-            Expanded(
-              child: ListView.builder(
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () => _navigateToCategoryPage(
-                        categories[index]), // Navigate on tap
-                    child: Card(
-                      margin: EdgeInsets.symmetric(vertical: 8.0),
-                      child: ListTile(
-                        title: Text(
-                          categories[index],
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        contentPadding: EdgeInsets.all(16.0),
-                      ),
-                    ),
-                  );
-                },
+     body: Padding(
+  padding: EdgeInsets.all(16.0),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Expanded(
+        child: ListView.builder(
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () => _navigateToCategoryPage(categories[index]),
+              child: Card(
+                margin: EdgeInsets.symmetric(vertical: 8.0),
+                child: ListTile(
+                  title: Text(
+                    categories[index],
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  contentPadding: EdgeInsets.all(16.0),
+                ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
+      SizedBox(height: 16), // Butonun listeden ayrılmasını sağlar
+      Align(
+        alignment: Alignment.bottomCenter, // Butonu ortalar
+        child: ElevatedButton(
+          onPressed: _addCategory,
+          child: Text("Yeni Kategori Ekle"),
+        ),
+      ),
+    ],
+  ),
+),
+
+    
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         currentIndex: _selectIndex,
-        onTap: _onItemTapped,
+        onTap: (index) {
+          setState(() {
+            _selectIndex = index;
+          });
+
+          if (index == 1) {
+            // Eğer "Ayarlar" seçildiyse
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SettingsPage()),
+            ).then((_) {
+              setState(() {
+                _selectIndex = 0;
+              });
+            });
+          }
+        },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Anasayfa"),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Ayarlar"),
@@ -136,8 +156,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-class CategoryPage {}
 
 // Ayarlar sayfası
 class SettingsPage extends StatelessWidget {
